@@ -37,17 +37,25 @@ def run_auto_trade_cycle(db: Session, market: MarketDataProvider) -> list[AutoTr
 
 
 def _check_portfolio_safety(db: Session, market: MarketDataProvider):
-    """보유 종목 손절/익절 자동 매도."""
+    """보유 종목 손절/익절 자동 매도. 종목별 가격 설정 우선, 없으면 글로벌 % 적용."""
     items = db.query(PortfolioItem).all()
     for item in items:
         if item.quantity <= 0:
             continue
         price_info = market.get_price(item.stock_code)
-        trigger = check_stop_loss_take_profit(
-            db, item.stock_code, price_info.current_price, float(item.avg_price), item.quantity
-        )
+        current_price = price_info.current_price
+
+        # 종목별 절대 가격 체크 (AutoTradeConfig에 설정된 경우)
+        trigger = _check_per_stock_price(db, item.stock_code, current_price)
+
+        # 종목별 설정 없으면 글로벌 % 체크
+        if trigger is None:
+            trigger = check_stop_loss_take_profit(
+                db, item.stock_code, current_price, float(item.avg_price), item.quantity
+            )
+
         if trigger:
-            can_trade, reason = check_can_trade(price_info.current_price, item.quantity)
+            can_trade, reason = check_can_trade(current_price, item.quantity)
             if can_trade:
                 order = submit_order(
                     db,
@@ -56,7 +64,7 @@ def _check_portfolio_safety(db: Session, market: MarketDataProvider):
                     order_type=OrderType.MARKET,
                     quantity=item.quantity,
                 )
-                safety.record_trade(price_info.current_price * item.quantity)
+                safety.record_trade(current_price * item.quantity)
                 logger.warning(
                     "%s %s x%d @ %s (order #%d)",
                     trigger.upper(),
@@ -65,6 +73,23 @@ def _check_portfolio_safety(db: Session, market: MarketDataProvider):
                     price_info.current_price,
                     order.id,
                 )
+
+
+def _check_per_stock_price(db: Session, stock_code: str, current_price: float) -> str | None:
+    """종목별 절대 가격 손절/익절 체크."""
+    config = db.query(AutoTradeConfig).filter_by(stock_code=stock_code, is_active=True).first()
+    if config is None:
+        return None
+
+    if config.stop_loss_price and current_price <= config.stop_loss_price:
+        logger.warning("STOP LOSS: %s @ %.0f (limit: %.0f)", stock_code, current_price, config.stop_loss_price)
+        return "stop_loss"
+
+    if config.take_profit_price and current_price >= config.take_profit_price:
+        logger.info("TAKE PROFIT: %s @ %.0f (limit: %.0f)", stock_code, current_price, config.take_profit_price)
+        return "take_profit"
+
+    return None
 
 
 def _process_config(db: Session, market: MarketDataProvider, config: AutoTradeConfig) -> AutoTradeLog:

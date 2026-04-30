@@ -75,7 +75,54 @@ def test_auto_trade_log_recorded(db_session):
     assert logs[0].strategy_name == "golden_cross"
 
 
+def test_per_stock_stop_loss(db_session):
+    _setup(db_session)
+    # 종목별 손절가 설정
+    config = AutoTradeConfig(
+        stock_code="005930",
+        strategy_name="momentum",
+        quantity=10,
+        stop_loss_price=48000,
+        take_profit_price=100000,
+    )
+    db_session.add(config)
+    db_session.commit()
+
+    from app.services.auto_trader import _check_per_stock_price
+
+    # 현재가 47000 < 손절가 48000 → stop_loss
+    assert _check_per_stock_price(db_session, "005930", 47000) == "stop_loss"
+    # 현재가 50000 → None
+    assert _check_per_stock_price(db_session, "005930", 50000) is None
+    # 현재가 101000 > 익절가 100000 → take_profit
+    assert _check_per_stock_price(db_session, "005930", 101000) == "take_profit"
+
+
+def test_per_stock_no_config(db_session):
+    from app.services.auto_trader import _check_per_stock_price
+
+    assert _check_per_stock_price(db_session, "999999", 50000) is None
+
+
 # --- API tests ---
+
+
+def test_api_create_config_with_prices(client, db_session):
+    response = client.post(
+        "/api/auto-trade/configs",
+        json={
+            "stock_code": "005930",
+            "stock_name": "삼성전자",
+            "strategy_name": "momentum",
+            "quantity": 10,
+            "stop_loss_price": 48000,
+            "take_profit_price": 100000,
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["stop_loss_price"] == 48000
+    assert data["take_profit_price"] == 100000
 
 
 def test_api_create_config(client, db_session):
@@ -87,6 +134,7 @@ def test_api_create_config(client, db_session):
     data = response.json()
     assert data["stock_code"] == "005930"
     assert data["is_active"] is True
+    assert data["stop_loss_price"] is None
 
 
 def test_api_list_configs(client, db_session):
