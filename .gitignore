@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# uv
+.python-version
+
+# Node.js
+node_modules/
+.next/
+out/
+
+# 환경 설정 / 시크릿
+.env
+.env.*
+kis_devlp.yaml
+config/*.yaml
+!config/*.example.yaml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 테스트 / 커버리지
+.coverage
+htmlcov/
+.pytest_cache/
+
+# 빌드
+*.egg
+*.whl
