@@ -40,6 +40,8 @@ def run_all_strategies(stock_code: str, prices: list[float]) -> list[StrategyRun
 # 전략 등록
 from app.strategies.golden_cross import GoldenCrossStrategy  # noqa: E402
 from app.strategies.momentum import MomentumStrategy  # noqa: E402
+from app.strategies.volume_breakout import VolumeBreakoutRetestStrategy  # noqa: E402
 
 register_strategy(GoldenCrossStrategy)
 register_strategy(MomentumStrategy)
+register_strategy(VolumeBreakoutRetestStrategy)
