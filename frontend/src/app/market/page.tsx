@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { fetchApi, type PriceInfo } from "@/lib/api";
+import { fetchApi, type Order, type PriceInfo } from "@/lib/api";
 
 const PRESET_STOCKS = [
   { code: "005930", name: "삼성전자" },
@@ -16,6 +16,11 @@ export default function MarketPage() {
   const [price, setPrice] = useState<PriceInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [orderSide, setOrderSide] = useState<"buy" | "sell">("buy");
+  const [orderType, setOrderType] = useState<"market" | "limit">("market");
+  const [orderQty, setOrderQty] = useState("1");
+  const [orderPrice, setOrderPrice] = useState("");
+  const [orderMsg, setOrderMsg] = useState("");
 
   async function handleSearch(stockCode: string) {
     setLoading(true);
@@ -99,6 +104,88 @@ export default function MarketPage() {
               </p>
             </div>
           </div>
+        </div>
+      )}
+      {/* 주문 생성 */}
+      {price && (
+        <div className="rounded-lg border border-gray-800 bg-gray-900 p-6">
+          <h2 className="text-lg font-semibold mb-4">주문</h2>
+          <div className="flex flex-wrap gap-3 items-end">
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">매매</label>
+              <select
+                value={orderSide}
+                onChange={(e) => setOrderSide(e.target.value as "buy" | "sell")}
+                className="rounded border border-gray-700 bg-gray-800 px-3 py-2 text-white"
+              >
+                <option value="buy">매수</option>
+                <option value="sell">매도</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">유형</label>
+              <select
+                value={orderType}
+                onChange={(e) => setOrderType(e.target.value as "market" | "limit")}
+                className="rounded border border-gray-700 bg-gray-800 px-3 py-2 text-white"
+              >
+                <option value="market">시장가</option>
+                <option value="limit">지정가</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">수량</label>
+              <input
+                type="number"
+                min="1"
+                value={orderQty}
+                onChange={(e) => setOrderQty(e.target.value)}
+                className="w-24 rounded border border-gray-700 bg-gray-800 px-3 py-2 text-white"
+              />
+            </div>
+            {orderType === "limit" && (
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">가격</label>
+                <input
+                  type="number"
+                  value={orderPrice}
+                  onChange={(e) => setOrderPrice(e.target.value)}
+                  placeholder={price.current_price.toString()}
+                  className="w-32 rounded border border-gray-700 bg-gray-800 px-3 py-2 text-white"
+                />
+              </div>
+            )}
+            <button
+              onClick={async () => {
+                try {
+                  setOrderMsg("");
+                  await fetchApi<Order>("/api/orders", {
+                    method: "POST",
+                    body: JSON.stringify({
+                      stock_code: price.code,
+                      side: orderSide,
+                      order_type: orderType,
+                      quantity: parseInt(orderQty),
+                      price: orderType === "limit" ? parseFloat(orderPrice) : null,
+                    }),
+                  });
+                  setOrderMsg(`${orderSide === "buy" ? "매수" : "매도"} 주문 생성 완료`);
+                } catch {
+                  setOrderMsg("주문 생성 실패");
+                }
+              }}
+              className={`rounded px-4 py-2 font-medium text-white ${
+                orderSide === "buy"
+                  ? "bg-red-600 hover:bg-red-700"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }`}
+            >
+              {orderSide === "buy" ? "매수" : "매도"}
+            </button>
+          </div>
+          {orderMsg && (
+            <p className="mt-3 text-sm text-green-400">{orderMsg}</p>
+          )}
         </div>
       )}
     </div>

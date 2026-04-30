@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 const navItems = [
   { href: "/", label: "대시보드" },
   { href: "/market", label: "시세 조회" },
+  { href: "/auto-trade", label: "자동매매" },
   { href: "/portfolio", label: "포트폴리오" },
   { href: "/orders", label: "주문 내역" },
 ];
