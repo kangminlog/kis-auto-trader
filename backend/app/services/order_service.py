@@ -15,6 +15,11 @@ def submit_order(
     if order_type == OrderType.LIMIT and price is None:
         raise ValueError("Limit order requires a price")
 
+    # 중복 주문 방지: 동일 종목 + 방향의 대기 주문이 있으면 거부
+    existing = db.query(Order).filter_by(stock_code=stock_code, side=side, status=OrderStatus.PENDING).first()
+    if existing:
+        raise ValueError(f"Duplicate pending order exists for {stock_code} ({side})")
+
     order = Order(
         stock_code=stock_code,
         side=side,

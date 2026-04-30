@@ -13,10 +13,14 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+from app.core.config import settings
 from app.core.database import Base
 from app.models import *  # noqa: F401, F403
 
 target_metadata = Base.metadata
+
+# 환경변수의 database_url을 우선 사용
+config.set_main_option("sqlalchemy.url", settings.database_url)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
