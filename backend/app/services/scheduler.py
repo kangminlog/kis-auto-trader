@@ -6,6 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from app.core.database import SessionLocal
 from app.services.auto_trader import run_auto_trade_cycle
 from app.services.execution_engine import process_pending_orders
+from app.services.market_hours import is_market_open
 from app.services.provider_factory import get_market_provider
 
 logger = logging.getLogger(__name__)
@@ -15,6 +16,10 @@ _scheduler: BackgroundScheduler | None = None
 
 def _auto_trade_job():
     """스케줄러가 호출하는 자동매매 작업."""
+    if not is_market_open():
+        logger.debug("Market closed, skipping auto trade cycle")
+        return
+
     logger.info("Auto trade cycle started at %s", datetime.now().strftime("%H:%M:%S"))
     db = SessionLocal()
     try:
@@ -51,7 +56,7 @@ def start_scheduler(interval_minutes: int = 5):
     _scheduler = BackgroundScheduler()
     _scheduler.add_job(_auto_trade_job, "interval", minutes=interval_minutes, id="auto_trade")
     _scheduler.start()
-    logger.info("Scheduler started (interval: %d min)", interval_minutes)
+    logger.info("Scheduler started (interval: %d min, market hours only)", interval_minutes)
 
 
 def stop_scheduler():
@@ -69,5 +74,14 @@ def is_scheduler_running() -> bool:
 
 
 def trigger_now():
-    """즉시 한 번 실행 (테스트/수동 트리거용)."""
-    _auto_trade_job()
+    """즉시 한 번 실행 (테스트/수동 트리거용). 장 시간 체크 무시."""
+    logger.info("Manual trigger at %s", datetime.now().strftime("%H:%M:%S"))
+    db = SessionLocal()
+    try:
+        market = get_market_provider()
+        run_auto_trade_cycle(db, market)
+        process_pending_orders(db, market)
+    except Exception as e:
+        logger.error("Manual trigger failed: %s", e)
+    finally:
+        db.close()
