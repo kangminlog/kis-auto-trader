@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+from app.api.strategy import router as strategy_router
 from app.api.trading import router as trading_router
 from app.core.config import settings
 
@@ -19,3 +20,4 @@ app.add_middleware(
 
 app.include_router(health_router)
 app.include_router(trading_router)
+app.include_router(strategy_router)
