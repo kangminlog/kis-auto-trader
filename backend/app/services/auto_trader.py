@@ -6,6 +6,7 @@ from app.models.auto_trade import AutoTradeConfig, AutoTradeLog
 from app.models.order import OrderSide, OrderType
 from app.models.portfolio import PortfolioItem
 from app.services.market_data import MarketDataProvider
+from app.services.notifier import notify
 from app.services.order_service import submit_order
 from app.services.safety import check_can_trade, check_stop_loss_take_profit, safety
 from app.strategies.base import Signal
@@ -94,6 +95,7 @@ def _process_config(db: Session, market: MarketDataProvider, config: AutoTradeCo
                     safety.record_trade(current_price * affordable_qty)
                     action = "order_placed"
                     order_id = order.id
+                    notify(f"🔴 매수 {config.stock_code} x{affordable_qty} ({config.strategy_name})")
                 else:
                     action = "blocked"
                     reason = block_reason
@@ -112,6 +114,7 @@ def _process_config(db: Session, market: MarketDataProvider, config: AutoTradeCo
                 safety.record_trade(current_price * config.quantity)
                 action = "order_placed"
                 order_id = order.id
+                notify(f"🔵 매도 {config.stock_code} x{config.quantity} ({config.strategy_name})")
             else:
                 action = "blocked"
                 reason = block_reason
