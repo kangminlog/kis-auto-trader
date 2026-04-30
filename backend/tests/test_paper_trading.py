@@ -1,3 +1,5 @@
+import pytest
+
 from app.models.order import OrderSide, OrderStatus, OrderType
 from app.models.portfolio import PortfolioItem
 from app.models.stock import Stock
@@ -43,6 +45,13 @@ def test_cancel_order(db_session):
     order = submit_order(db_session, stock_code="005930", side=OrderSide.BUY, order_type=OrderType.MARKET, quantity=10)
     cancelled = cancel_order(db_session, order.id)
     assert cancelled.status == OrderStatus.CANCELLED
+
+
+def test_duplicate_order_rejected(db_session):
+    _setup_stock(db_session)
+    submit_order(db_session, stock_code="005930", side=OrderSide.BUY, order_type=OrderType.MARKET, quantity=10)
+    with pytest.raises(ValueError, match="Duplicate"):
+        submit_order(db_session, stock_code="005930", side=OrderSide.BUY, order_type=OrderType.MARKET, quantity=5)
 
 
 def test_get_orders(db_session):
