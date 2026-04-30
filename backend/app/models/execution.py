@@ -1,0 +1,18 @@
+from datetime import datetime
+
+from sqlalchemy import DateTime, ForeignKey, Numeric, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.core.database import Base
+
+
+class Execution(Base):
+    __tablename__ = "executions"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"))
+    quantity: Mapped[int] = mapped_column()
+    price: Mapped[float] = mapped_column(Numeric(15, 2))
+    executed_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    order: Mapped["Order"] = relationship(back_populates="executions")  # noqa: F821
