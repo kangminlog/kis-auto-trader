@@ -37,3 +37,34 @@ export interface PortfolioItem {
   quantity: number;
   avg_price: number;
 }
+
+export interface AutoTradeConfig {
+  id: number;
+  stock_code: string;
+  stock_name: string;
+  strategy_name: string;
+  is_active: boolean;
+  quantity: number;
+  max_invest_amount: number;
+}
+
+export interface AutoTradeLog {
+  id: number;
+  config_id: number;
+  stock_code: string;
+  strategy_name: string;
+  signal: string;
+  reason: string;
+  action_taken: string;
+  order_id: number | null;
+  created_at: string;
+}
+
+export interface SchedulerStatus {
+  running: boolean;
+}
+
+export interface StrategyInfo {
+  name: string;
+  description: string;
+}
