@@ -17,8 +17,8 @@
 <p align="center">
   <a href="https://github.com/kangminlog/kis-auto-trader/actions"><img src="https://github.com/kangminlog/kis-auto-trader/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="https://github.com/kangminlog/kis-auto-trader/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License" /></a>
-  <img src="https://img.shields.io/badge/tests-115%20passed-brightgreen" alt="Tests" />
-  <img src="https://img.shields.io/badge/API-28%20endpoints-blue" alt="API" />
+  <img src="https://img.shields.io/badge/tests-126%20passed-brightgreen" alt="Tests" />
+  <img src="https://img.shields.io/badge/API-30%20endpoints-blue" alt="API" />
 </p>
 
 ---
@@ -187,7 +187,7 @@ cd backend && uv run fastapi dev
 kis-auto-trader/
 ├── backend/
 │   ├── app/
-│   │   ├── api/              # 28개 REST API 엔드포인트
+│   │   ├── api/              # 30개 REST API 엔드포인트
 │   │   │   ├── auth.py       # 인증 (JWT)
 │   │   │   ├── auto_trade.py # 자동매매 설정/스케줄러/로그
 │   │   │   ├── safety.py     # 안전장치 (kill switch, 한도)
@@ -209,7 +209,7 @@ kis-auto-trader/
 │   │       ├── momentum.py        # 모멘텀
 │   │       ├── indicators.py      # ATR, Regime, Sizing
 │   │       └── backtest.py        # 백테스트 엔진
-│   └── tests/                # 115 tests
+│   └── tests/                # 126 tests
 ├── frontend/                 # Next.js 대시보드
 │   └── src/
 │       ├── app/              # 6개 페이지
@@ -223,7 +223,7 @@ kis-auto-trader/
 ---
 
 <details>
-<summary><strong>API 엔드포인트 (28개)</strong></summary>
+<summary><strong>API 엔드포인트 (30개)</strong></summary>
 
 #### 공개
 | Method | Path | 설명 |

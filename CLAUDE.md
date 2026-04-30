@@ -10,19 +10,19 @@ FastAPI 백엔드 + Next.js 프론트엔드 구조.
 ## 현재 상태 (v1.1 완료)
 
 - v0.1~v1.1 전체 완료
-- 115 tests, CI (backend ruff+pytest, frontend eslint+build)
-- 28개 API 엔드포인트, 6개 프론트 페이지, 8개 DB 테이블
+- 126 tests, CI (backend ruff+pytest, frontend eslint+build)
+- 30개 API 엔드포인트, 6개 프론트 페이지, 8개 DB 테이블
 - API 키만 넣으면 실전 운영 가능
 
 ## 아키텍처
 
 - `/backend` — FastAPI 기반 매매 엔진
-  - `/app/api` — 28개 REST API (auth, trading, strategy, auto_trade, safety, scan_config)
+  - `/app/api` — 30개 REST API (auth, trading, strategy, auto_trade, safety, scan_config)
   - `/app/core` — 설정, DB, KIS 인증, JWT, 환경 전환
   - `/app/models` — 8 테이블 (Stock, Order, Execution, Portfolio, AutoTradeConfig/Log, ScanConfig, SignalOutcome)
   - `/app/services` — KIS 클라이언트, 주문, 체결, 자동매매, 스케줄러, 안전장치, 알림, 유니버스, 잔고동기화, 파라미터관리
   - `/app/strategies` — 3 전략 (골든크로스, 모멘텀, Volume Breakout Retest) + 백테스트, 지표, 러너
-  - `/tests` — pytest 115건
+  - `/tests` — pytest 126건
 - `/frontend` — Next.js 15 + TypeScript + Tailwind CSS
   - `/src/app` — 대시보드, 시세+주문, 자동매매, 포트폴리오, 주문 내역
   - `/src/lib/api.ts` — 백엔드 API 헬퍼
