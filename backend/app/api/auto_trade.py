@@ -22,6 +22,8 @@ class ConfigRequest(BaseModel):
     strategy_name: str
     quantity: int = 1
     max_invest_amount: float = 1_000_000
+    stop_loss_price: float | None = None
+    take_profit_price: float | None = None
 
 
 class ConfigResponse(BaseModel):
@@ -32,6 +34,8 @@ class ConfigResponse(BaseModel):
     is_active: bool
     quantity: int
     max_invest_amount: float
+    stop_loss_price: float | None
+    take_profit_price: float | None
 
     model_config = {"from_attributes": True}
 
@@ -44,6 +48,8 @@ def create_config(req: ConfigRequest, db: Session = Depends(get_db)):
         strategy_name=req.strategy_name,
         quantity=req.quantity,
         max_invest_amount=req.max_invest_amount,
+        stop_loss_price=req.stop_loss_price,
+        take_profit_price=req.take_profit_price,
     )
     db.add(config)
     db.commit()

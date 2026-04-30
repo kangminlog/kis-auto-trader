@@ -57,6 +57,8 @@ export interface AutoTradeConfig {
   is_active: boolean;
   quantity: number;
   max_invest_amount: number;
+  stop_loss_price: number | null;
+  take_profit_price: number | null;
 }
 
 export interface AutoTradeLog {

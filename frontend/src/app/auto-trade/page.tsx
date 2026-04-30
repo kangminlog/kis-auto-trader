@@ -29,6 +29,8 @@ export default function AutoTradePage() {
   const [newName, setNewName] = useState("");
   const [newStrategy, setNewStrategy] = useState("");
   const [newQty, setNewQty] = useState("10");
+  const [newStopLoss, setNewStopLoss] = useState("");
+  const [newTakeProfit, setNewTakeProfit] = useState("");
 
   function loadAll() {
     fetchApi<AutoTradeConfig[]>("/api/auto-trade/configs").then(setConfigs).catch(() => {});
@@ -54,6 +56,8 @@ export default function AutoTradePage() {
           stock_name: newName,
           strategy_name: newStrategy,
           quantity: parseInt(newQty),
+          stop_loss_price: newStopLoss ? parseFloat(newStopLoss) : null,
+          take_profit_price: newTakeProfit ? parseFloat(newTakeProfit) : null,
         }),
       });
       setNewCode("");
@@ -187,6 +191,26 @@ export default function AutoTradePage() {
               className="w-20 rounded border border-gray-700 bg-gray-800 px-3 py-2 text-white"
             />
           </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">손절가</label>
+            <input
+              type="number"
+              value={newStopLoss}
+              onChange={(e) => setNewStopLoss(e.target.value)}
+              placeholder="미설정"
+              className="w-28 rounded border border-gray-700 bg-gray-800 px-3 py-2 text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">익절가</label>
+            <input
+              type="number"
+              value={newTakeProfit}
+              onChange={(e) => setNewTakeProfit(e.target.value)}
+              placeholder="미설정"
+              className="w-28 rounded border border-gray-700 bg-gray-800 px-3 py-2 text-white"
+            />
+          </div>
           <button
             onClick={handleAddConfig}
             className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
@@ -205,6 +229,8 @@ export default function AutoTradePage() {
                 <th className="px-4 py-3">종목</th>
                 <th className="px-4 py-3">전략</th>
                 <th className="px-4 py-3 text-right">수량</th>
+                <th className="px-4 py-3 text-right">손절가</th>
+                <th className="px-4 py-3 text-right">익절가</th>
                 <th className="px-4 py-3">상태</th>
                 <th className="px-4 py-3"></th>
               </tr>
@@ -220,6 +246,12 @@ export default function AutoTradePage() {
                   </td>
                   <td className="px-4 py-3 text-gray-300">{c.strategy_name}</td>
                   <td className="px-4 py-3 text-right">{c.quantity}</td>
+                  <td className="px-4 py-3 text-right text-red-400">
+                    {c.stop_loss_price ? `${c.stop_loss_price.toLocaleString()}` : "-"}
+                  </td>
+                  <td className="px-4 py-3 text-right text-green-400">
+                    {c.take_profit_price ? `${c.take_profit_price.toLocaleString()}` : "-"}
+                  </td>
                   <td className="px-4 py-3">
                     <button
                       onClick={() => handleToggle(c.id)}

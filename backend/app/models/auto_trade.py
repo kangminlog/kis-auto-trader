@@ -18,6 +18,8 @@ class AutoTradeConfig(Base):
     is_active: Mapped[bool] = mapped_column(default=True)
     quantity: Mapped[int] = mapped_column(Integer, default=1)
     max_invest_amount: Mapped[float] = mapped_column(Float, default=1_000_000)
+    stop_loss_price: Mapped[float | None] = mapped_column(Float, nullable=True)  # 손절 가격
+    take_profit_price: Mapped[float | None] = mapped_column(Float, nullable=True)  # 익절 가격
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
 
