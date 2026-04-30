@@ -150,7 +150,7 @@ def test_api_analyze(client):
     response = client.post("/api/strategy/analyze", json={"stock_code": "005930"})
     assert response.status_code == 200
     data = response.json()
-    assert len(data) == 2  # golden_cross + momentum
+    assert len(data) == 3  # golden_cross + momentum + volume_breakout_retest
 
 
 def test_api_backtest(client):
