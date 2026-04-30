@@ -7,36 +7,25 @@ FastAPI 백엔드 + Next.js 프론트엔드 구조.
 
 참고 레포: https://github.com/koreainvestment/open-trading-api
 
-## 현재 상태 (v0.4 완료)
+## 현재 상태 (v1.0 완료)
 
-- v0.1~v0.4 완료, v1.0 진행 중
-- 48 tests, CI (backend lint+test, frontend lint+build)
-- 현재 "자동매매"는 수동 API 호출 필요 → 자동 스케줄러 미구현
-- 프론트엔드에 주문 생성 폼/전략 설정 화면 없음
-
-### v1.0 작업 순서
-1. #25 자동매매 스케줄러 (핵심 자동 루프)
-2. #30 주문 생성 폼 + 전략 활성화 UI
-3. #24 안전장치 (손절, 일일 한도, kill switch)
-4. #32 API 인증/인가
-5. #31 PostgreSQL 전환
-6. #27 텔레그램 알림
-7. #28 Docker Compose 배포
-8. #26 대시보드 실시간 업데이트
+- v0.1~v1.0 전체 완료, 모든 Milestone Closed
+- 79 tests, CI (backend ruff+pytest, frontend eslint+build)
+- 22개 API 엔드포인트, 5개 프론트 페이지
 
 ## 아키텍처
 
-- `/backend` — FastAPI 기반 매매 엔진, KIS API 연동
-  - `/app/api` — REST API 엔드포인트 (health, trading, strategy)
-  - `/app/core` — 설정, DB, KIS 인증
-  - `/app/models` — Stock, Order, Execution, PortfolioItem (SQLAlchemy)
-  - `/app/services` — KIS API 클라이언트, 주문 처리, 시세 조회, 체결 엔진
+- `/backend` — FastAPI 기반 매매 엔진
+  - `/app/api` — REST API (auth, trading, strategy, auto_trade, safety, health)
+  - `/app/core` — 설정, DB, KIS 인증, JWT 인증
+  - `/app/models` — Stock, Order, Execution, PortfolioItem, AutoTradeConfig, AutoTradeLog
+  - `/app/services` — KIS 클라이언트, 주문, 체결, 자동매매, 스케줄러, 안전장치, 알림
   - `/app/strategies` — BaseStrategy, 골든크로스, 모멘텀, 백테스트, 러너
-  - `/tests` — pytest 48건
+  - `/tests` — pytest 79건
 - `/frontend` — Next.js 15 + TypeScript + Tailwind CSS
-  - `/src/app` — 대시보드, 시세 조회, 포트폴리오, 주문 내역
+  - `/src/app` — 대시보드, 시세+주문, 자동매매, 포트폴리오, 주문 내역
   - `/src/lib/api.ts` — 백엔드 API 헬퍼
-- `/docs` — 설계 문서
+- `docker-compose.yml` — PostgreSQL + backend + frontend
 
 ## 개발 규칙
 
