@@ -10,8 +10,8 @@ FastAPI 백엔드 + Next.js 프론트엔드 구조.
 ## 현재 상태 (v1.0 완료)
 
 - v0.1~v1.0 전체 완료, 모든 Milestone Closed
-- 79 tests, CI (backend ruff+pytest, frontend eslint+build)
-- 22개 API 엔드포인트, 5개 프론트 페이지
+- 96 tests, CI (backend ruff+pytest, frontend eslint+build)
+- 23개 API 엔드포인트, 6개 프론트 페이지
 
 ## 아키텍처
 
@@ -20,12 +20,22 @@ FastAPI 백엔드 + Next.js 프론트엔드 구조.
   - `/app/core` — 설정, DB, KIS 인증, JWT 인증
   - `/app/models` — Stock, Order, Execution, PortfolioItem, AutoTradeConfig, AutoTradeLog
   - `/app/services` — KIS 클라이언트, 주문, 체결, 자동매매, 스케줄러, 안전장치, 알림
-  - `/app/strategies` — BaseStrategy, 골든크로스, 모멘텀, 백테스트, 러너
-  - `/tests` — pytest 79건
+  - `/app/strategies` — BaseStrategy, 골든크로스, 모멘텀, Volume Breakout Retest, 백테스트, 러너, 지표 유틸
+  - `/tests` — pytest 96건
 - `/frontend` — Next.js 15 + TypeScript + Tailwind CSS
   - `/src/app` — 대시보드, 시세+주문, 자동매매, 포트폴리오, 주문 내역
   - `/src/lib/api.ts` — 백엔드 API 헬퍼
 - `docker-compose.yml` — PostgreSQL + backend + frontend
+- `/docs` — 전략 스펙 문서
+  - `strategy-volume-breakout-retest.md` — Volume Breakout Retest 전략 상세 스펙
+
+## 전략 목록
+
+| 전략 | 파일 | 문서 | 설명 |
+|------|------|------|------|
+| 골든크로스 | `strategies/golden_cross.py` | — | 단기/장기 MA 교차 |
+| 모멘텀 | `strategies/momentum.py` | — | N일 수익률 임계값 |
+| Volume Breakout Retest | `strategies/volume_breakout.py` | `docs/strategy-volume-breakout-retest.md` | 거래대금 폭발일 앵커 → 횡보 → 재접근 매수 (6단계 필터, ATR TP/SL) |
 
 ## 개발 규칙
 
