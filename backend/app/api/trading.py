@@ -2,13 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from app.core.auth import get_current_user
 from app.core.database import get_db
 from app.models.order import OrderSide, OrderStatus, OrderType
 from app.services import order_service
 from app.services.execution_engine import process_pending_orders
 from app.services.market_data import DummyMarketDataProvider
 
-router = APIRouter(prefix="/api", tags=["trading"])
+router = APIRouter(prefix="/api", tags=["trading"], dependencies=[Depends(get_current_user)])
 
 
 class OrderRequest(BaseModel):

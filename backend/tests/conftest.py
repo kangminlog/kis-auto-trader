@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+from app.core.auth import get_current_user
 from app.core.database import Base, get_db
 from app.main import app
 
@@ -30,6 +31,10 @@ def client(db_session):
     def override_get_db():
         yield db_session
 
+    def override_auth():
+        return "test_user"
+
     app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_current_user] = override_auth
     yield TestClient(app)
     app.dependency_overrides.clear()

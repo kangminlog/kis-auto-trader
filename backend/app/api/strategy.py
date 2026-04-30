@@ -1,12 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
+from app.core.auth import get_current_user
 from app.services.market_data import DummyMarketDataProvider
 from app.strategies.backtest import BacktestMetrics, run_backtest
 from app.strategies.base import Signal
 from app.strategies.runner import STRATEGY_REGISTRY, get_strategy, run_all_strategies
 
-router = APIRouter(prefix="/api/strategy", tags=["strategy"])
+router = APIRouter(prefix="/api/strategy", tags=["strategy"], dependencies=[Depends(get_current_user)])
 
 
 class StrategyInfo(BaseModel):

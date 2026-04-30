@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from app.core.auth import get_current_user
 from app.core.database import get_db
 from app.models.auto_trade import AutoTradeConfig, AutoTradeLog
 from app.services.auto_trader import run_auto_trade_cycle
@@ -9,7 +10,7 @@ from app.services.execution_engine import process_pending_orders
 from app.services.market_data import DummyMarketDataProvider
 from app.services.scheduler import is_scheduler_running, start_scheduler, stop_scheduler
 
-router = APIRouter(prefix="/api/auto-trade", tags=["auto-trade"])
+router = APIRouter(prefix="/api/auto-trade", tags=["auto-trade"], dependencies=[Depends(get_current_user)])
 
 
 # --- 자동매매 설정 ---
