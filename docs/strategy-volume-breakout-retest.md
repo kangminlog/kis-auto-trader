@@ -75,8 +75,12 @@ SL = 현재가 − k_sl × ATR(14)
 | min_amount_krw | 300,000 | 최소 주문 금액 (원) |
 | max_amount_krw | 500,000 | 최대 주문 금액 (원) |
 
-## 미구현 (향후)
+## 추가 구현 완료
 
-- 유니버스 자동 스캔 (현재는 수동 종목 지정)
-- 동적 파라미터 튜닝 (signal_outcomes 기반 자동 보정)
-- scan_config DB 테이블 (현재는 코드 내 기본값)
+| 기능 | 파일 | 설명 |
+|------|------|------|
+| 유니버스 스캐너 | `services/universe.py` | 시총/유형/키워드/거래정지 필터링 |
+| scan_config DB | `models/scan_config.py`, `services/scan_config_service.py` | 22개 파라미터 DB 관리 |
+| SignalOutcome | `models/scan_config.py` | 시그널별 진입/청산/PnL 추적 |
+| 동적 튜닝 | `services/scan_config_service.py::run_tuning` | Regime별 승률 분석 → k_tp/k_sl 보정 제안 |
+| API | `api/scan_config.py` | params CRUD, init, tuning run/apply |
