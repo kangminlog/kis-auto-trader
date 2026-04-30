@@ -10,11 +10,13 @@ from app.api.safety import router as safety_router
 from app.api.strategy import router as strategy_router
 from app.api.trading import router as trading_router
 from app.core.config import settings
-from app.services.scheduler import stop_scheduler
+from app.services.scheduler import start_scheduler, stop_scheduler
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    if settings.scheduler_auto_start:
+        start_scheduler(settings.scheduler_interval_minutes)
     yield
     stop_scheduler()
 

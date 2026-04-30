@@ -1,13 +1,24 @@
+import { getToken, removeToken } from "./auth";
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = getToken();
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,
     },
   });
+  if (res.status === 401) {
+    removeToken();
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    throw new Error("Unauthorized");
+  }
   if (!res.ok) {
     throw new Error(`API error: ${res.status}`);
   }
