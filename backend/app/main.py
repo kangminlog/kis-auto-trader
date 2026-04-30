@@ -7,6 +7,7 @@ from app.api.auth import router as auth_router
 from app.api.auto_trade import router as auto_trade_router
 from app.api.health import router as health_router
 from app.api.safety import router as safety_router
+from app.api.scan_config import router as scan_config_router
 from app.api.strategy import router as strategy_router
 from app.api.trading import router as trading_router
 from app.core.config import settings
@@ -43,3 +44,4 @@ app.include_router(trading_router)
 app.include_router(strategy_router)
 app.include_router(auto_trade_router)
 app.include_router(safety_router)
+app.include_router(scan_config_router)
