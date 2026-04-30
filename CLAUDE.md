@@ -7,21 +7,22 @@ FastAPI 백엔드 + Next.js 프론트엔드 구조.
 
 참고 레포: https://github.com/koreainvestment/open-trading-api
 
-## 현재 상태 (v1.0 완료)
+## 현재 상태 (v1.1 완료)
 
-- v0.1~v1.0 전체 완료, 모든 Milestone Closed
-- 96 tests, CI (backend ruff+pytest, frontend eslint+build)
-- 23개 API 엔드포인트, 6개 프론트 페이지
+- v0.1~v1.1 전체 완료
+- 115 tests, CI (backend ruff+pytest, frontend eslint+build)
+- 28개 API 엔드포인트, 6개 프론트 페이지, 8개 DB 테이블
+- API 키만 넣으면 실전 운영 가능
 
 ## 아키텍처
 
 - `/backend` — FastAPI 기반 매매 엔진
-  - `/app/api` — REST API (auth, trading, strategy, auto_trade, safety, health)
-  - `/app/core` — 설정, DB, KIS 인증, JWT 인증
-  - `/app/models` — Stock, Order, Execution, PortfolioItem, AutoTradeConfig, AutoTradeLog
-  - `/app/services` — KIS 클라이언트, 주문, 체결, 자동매매, 스케줄러, 안전장치, 알림
-  - `/app/strategies` — BaseStrategy, 골든크로스, 모멘텀, Volume Breakout Retest, 백테스트, 러너, 지표 유틸
-  - `/tests` — pytest 96건
+  - `/app/api` — 28개 REST API (auth, trading, strategy, auto_trade, safety, scan_config)
+  - `/app/core` — 설정, DB, KIS 인증, JWT, 환경 전환
+  - `/app/models` — 8 테이블 (Stock, Order, Execution, Portfolio, AutoTradeConfig/Log, ScanConfig, SignalOutcome)
+  - `/app/services` — KIS 클라이언트, 주문, 체결, 자동매매, 스케줄러, 안전장치, 알림, 유니버스, 잔고동기화, 파라미터관리
+  - `/app/strategies` — 3 전략 (골든크로스, 모멘텀, Volume Breakout Retest) + 백테스트, 지표, 러너
+  - `/tests` — pytest 115건
 - `/frontend` — Next.js 15 + TypeScript + Tailwind CSS
   - `/src/app` — 대시보드, 시세+주문, 자동매매, 포트폴리오, 주문 내역
   - `/src/lib/api.ts` — 백엔드 API 헬퍼
@@ -60,13 +61,14 @@ FastAPI 백엔드 + Next.js 프론트엔드 구조.
 - 작업 시작 시 `In Progress`로 이동, PR 머지 시 `Done`으로 이동
 
 #### Milestones
-| Milestone | 목표 |
-|-----------|------|
-| v0.1 - 페이퍼 트레이딩 | 더미 데이터 기반 매매 시뮬레이션 |
-| v0.2 - KIS API 연동 | 모의투자 API 인증/시세/주문 |
-| v0.3 - 웹 대시보드 | Next.js 시세 조회, 잔고 확인 UI |
-| v0.4 - 전략 엔진 | 매매 전략 프레임워크 + 백테스트 |
-| v1.0 - 실전 투자 | 실전 연동 및 안정화 |
+| Milestone | 목표 | 상태 |
+|-----------|------|------|
+| v0.1 - 페이퍼 트레이딩 | 더미 데이터 기반 매매 시뮬레이션 | 완료 |
+| v0.2 - KIS API 연동 | 모의투자 API 인증/시세/주문 | 완료 |
+| v0.3 - 웹 대시보드 | Next.js 시세 조회, 잔고 확인 UI | 완료 |
+| v0.4 - 전략 엔진 | 매매 전략 프레임워크 + 백테스트 | 완료 |
+| v1.0 - 실전 투자 | 자동매매, 안전장치, 인증, 알림, Docker | 완료 |
+| v1.1 - 실전 운영 준비 | 로그인 UI, 환경전환, Volume Breakout, 튜닝 | 완료 |
 
 - 모든 Issue는 반드시 Milestone에 할당
 - Milestone 단위로 릴리즈 진행
