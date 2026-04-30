@@ -294,6 +294,53 @@ kis-auto-trader/
 
 ---
 
+## 실전 운영 가이드
+
+개발은 완료되었습니다. 아래 순서대로 진행하면 됩니다.
+
+### Step 1. KIS API 키 발급
+
+1. [한국투자증권](https://www.koreainvestment.com/) 계좌 개설
+2. 홈페이지 → Open API → 신청 → 앱키/시크릿 발급
+3. 설정 파일 작성:
+
+```bash
+mkdir -p ~/KIS/config
+cat > ~/KIS/config/kis_devlp.yaml << EOF
+my_app: "발급받은 앱키"
+my_sec: "발급받은 앱시크릿"
+my_acct: "계좌번호"
+my_id: "HTS ID"
+EOF
+```
+
+### Step 2. 모의투자 검증 (최소 1주일)
+
+```bash
+export KIS_KIS_ENV=virtual
+export KIS_SCHEDULER_AUTO_START=true
+export KIS_SECRET_KEY="$(openssl rand -hex 32)"
+
+cd backend && uv run alembic upgrade head && uv run fastapi dev &
+cd frontend && npm run dev &
+```
+
+> `localhost:3000/login` → 계정 생성 → 전략 설정 → 스케줄러 시작 → 로그 확인
+
+### Step 3. 실전 전환
+
+```bash
+export KIS_KIS_ENV=production   # 이 순간부터 실제 자금이 사용됩니다
+```
+
+> **체크리스트:**
+> - [ ] 모의투자에서 최소 1주일 이상 검증 완료
+> - [ ] 손절/익절 가격 설정 확인
+> - [ ] Kill Switch 테스트 완료
+> - [ ] 일일 매매 한도 적절히 설정
+
+---
+
 ## 면책조항
 
 이 소프트웨어는 교육 및 개인 프로젝트 목적으로 제작되었습니다.
