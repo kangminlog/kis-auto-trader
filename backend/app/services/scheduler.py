@@ -6,7 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from app.core.database import SessionLocal
 from app.services.auto_trader import run_auto_trade_cycle
 from app.services.execution_engine import process_pending_orders
-from app.services.market_data import DummyMarketDataProvider
+from app.services.provider_factory import get_market_provider
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ def _auto_trade_job():
     logger.info("Auto trade cycle started at %s", datetime.now().strftime("%H:%M:%S"))
     db = SessionLocal()
     try:
-        market = DummyMarketDataProvider()
+        market = get_market_provider()
 
         # 1. 전략 실행 → 시그널 발생 시 주문 생성
         logs = run_auto_trade_cycle(db, market)

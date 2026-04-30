@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from app.core.auth import get_current_user
-from app.services.market_data import DummyMarketDataProvider
+from app.services.provider_factory import get_market_provider
 from app.strategies.backtest import BacktestMetrics, run_backtest
 from app.strategies.base import Signal
 from app.strategies.runner import STRATEGY_REGISTRY, get_strategy, run_all_strategies
@@ -37,7 +37,7 @@ class AnalyzeResult(BaseModel):
 @router.post("/analyze", response_model=list[AnalyzeResult])
 def analyze(req: AnalyzeRequest):
     # 더미 시세로 가격 데이터 생성
-    market = DummyMarketDataProvider()
+    market = get_market_provider()
     prices = [market.get_price(req.stock_code).current_price for _ in range(30)]
 
     if req.strategy_name:
@@ -97,7 +97,7 @@ def backtest(req: BacktestRequest):
     strategy = get_strategy(req.strategy_name, **(req.params or {}))
 
     # 더미 가격 생성 (과거→현재 순서)
-    market = DummyMarketDataProvider()
+    market = get_market_provider()
     prices = [market.get_price(req.stock_code).current_price for _ in range(req.days)]
 
     result = run_backtest(strategy, req.stock_code, prices, req.initial_capital)

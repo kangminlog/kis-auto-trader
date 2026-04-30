@@ -7,7 +7,7 @@ from app.core.database import get_db
 from app.models.order import OrderSide, OrderStatus, OrderType
 from app.services import order_service
 from app.services.execution_engine import process_pending_orders
-from app.services.market_data import DummyMarketDataProvider
+from app.services.provider_factory import get_market_provider
 
 router = APIRouter(prefix="/api", tags=["trading"], dependencies=[Depends(get_current_user)])
 
@@ -64,7 +64,7 @@ def list_orders(status: OrderStatus | None = None, db: Session = Depends(get_db)
 
 @router.post("/execute")
 def execute_pending_orders(db: Session = Depends(get_db)):
-    market = DummyMarketDataProvider()
+    market = get_market_provider()
     executions = process_pending_orders(db, market)
     return {"executed": len(executions)}
 
@@ -79,7 +79,7 @@ class PriceResponse(BaseModel):
 
 @router.get("/price/{stock_code}", response_model=PriceResponse)
 def get_price(stock_code: str):
-    market = DummyMarketDataProvider()
+    market = get_market_provider()
     return market.get_price(stock_code)
 
 
@@ -96,3 +96,28 @@ def get_portfolio(db: Session = Depends(get_db)):
     from app.models.portfolio import PortfolioItem
 
     return db.query(PortfolioItem).all()
+
+
+@router.post("/portfolio/sync")
+def sync_portfolio(db: Session = Depends(get_db)):
+    """KIS 실제 잔고와 로컬 DB 동기화. virtual/production 환경에서만 동작."""
+    from app.core.config import settings
+    from app.core.kis_config import KisEnvironment
+
+    if settings.kis_env == KisEnvironment.PAPER:
+        return {"error": "Paper mode does not support balance sync"}
+
+    from app.core.kis_config import load_credentials
+    from app.services.balance_sync import sync_balance
+    from app.services.kis_client import KisClient
+
+    try:
+        credentials = load_credentials()
+        client = KisClient(credentials, KisEnvironment(settings.kis_env))
+        result = sync_balance(db, client)
+        client.close()
+        return result
+    except FileNotFoundError:
+        raise HTTPException(status_code=400, detail="KIS credentials not configured")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

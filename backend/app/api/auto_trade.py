@@ -7,7 +7,7 @@ from app.core.database import get_db
 from app.models.auto_trade import AutoTradeConfig, AutoTradeLog
 from app.services.auto_trader import run_auto_trade_cycle
 from app.services.execution_engine import process_pending_orders
-from app.services.market_data import DummyMarketDataProvider
+from app.services.provider_factory import get_market_provider
 from app.services.scheduler import is_scheduler_running, start_scheduler, stop_scheduler
 
 router = APIRouter(prefix="/api/auto-trade", tags=["auto-trade"], dependencies=[Depends(get_current_user)])
@@ -103,7 +103,7 @@ def scheduler_stop():
 
 @router.post("/scheduler/trigger")
 def scheduler_trigger(db: Session = Depends(get_db)):
-    market = DummyMarketDataProvider()
+    market = get_market_provider()
     logs = run_auto_trade_cycle(db, market)
     process_pending_orders(db, market)
     return {"triggered": True, "configs_checked": len(logs)}
