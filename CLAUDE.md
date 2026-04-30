@@ -72,12 +72,32 @@ FastAPI 백엔드 + Next.js 프론트엔드 구조.
 - `.github/ISSUE_TEMPLATE/feature.md` — 기능 요청
 - `.github/ISSUE_TEMPLATE/bug.md` — 버그 리포트
 
+#### GitHub Actions (CI)
+- `.github/workflows/ci.yml` — PR 및 main 푸시 시 자동 실행
+- 백엔드: ruff lint → ruff format check → pytest
+- CI 통과 필수 (Branch Protection에 연동)
+
+#### Branch Protection (main)
+- main 직접 푸시 차단
+- PR을 통해서만 머지 가능
+- CI (Backend Lint & Test) 통과 필수
+- 관리자도 규칙 적용 (enforce_admins)
+
+#### PR Template
+- `.github/pull_request_template.md` — PR 생성 시 자동 적용
+- Summary, Related Issue, Changes, Checklist 포함
+
+#### Discussions
+- 설계 결정, 아이디어 논의, 기술 검토 등 Issue와 분리된 논의 공간
+- Issue: 구체적 작업 단위 / Discussion: 열린 논의, 의사결정 기록
+
 #### 작업 흐름 요약
 1. Issue 생성 (템플릿 사용, Label + Milestone 할당, 보드에 추가)
 2. 브랜치 생성: `feat/#3-add-paper-trading`
 3. 작업 → 커밋 (Conventional Commits)
 4. PR 생성 (`Closes #3` 포함, 보드에서 `In Progress`)
-5. Squash Merge → 보드에서 `Done`
+5. CI 자동 실행 (lint + test)
+6. CI 통과 → Squash Merge → 보드에서 `Done`
 
 ### KIS API 관련
 - 인증 정보(앱키, 시크릿)는 `kis_devlp.yaml`에 저장 → .gitignore 대상
