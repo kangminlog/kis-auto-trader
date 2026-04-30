@@ -35,6 +35,12 @@ Thumbs.db
 # DB
 *.db
 
+# 로그
+logs/
+
+# 백업
+backups/
+
 # 테스트 / 커버리지
 .coverage
 htmlcov/

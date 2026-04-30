@@ -15,6 +15,23 @@ services:
       interval: 5s
       retries: 5
 
+  db-backup:
+    image: postgres:16-alpine
+    environment:
+      PGPASSWORD: ${DB_PASSWORD:-kis_dev_password}
+    volumes:
+      - ./backups:/backups
+    entrypoint: >
+      sh -c "while true; do
+        pg_dump -h db -U kis kis_auto_trader > /backups/backup_$$(date +%Y%m%d_%H%M%S).sql
+        find /backups -name '*.sql' -mtime +7 -delete
+        sleep 86400
+      done"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
   backend:
     build: ./backend
     ports:
@@ -23,6 +40,10 @@ services:
       - KIS_SECRET_KEY=${SECRET_KEY:-change-me-in-production-use-32-chars!}
       - KIS_KIS_ENV=paper
       - KIS_DATABASE_URL=postgresql://kis:${DB_PASSWORD:-kis_dev_password}@db:5432/kis_auto_trader
+      - KIS_SCHEDULER_AUTO_START=${SCHEDULER_AUTO_START:-false}
+      - KIS_SCHEDULER_INTERVAL_MINUTES=${SCHEDULER_INTERVAL:-5}
+    volumes:
+      - backend-logs:/app/logs
     depends_on:
       db:
         condition: service_healthy
@@ -40,3 +61,4 @@ services:
 
 volumes:
   pgdata:
+  backend-logs:

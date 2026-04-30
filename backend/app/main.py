@@ -11,11 +11,13 @@ from app.api.scan_config import router as scan_config_router
 from app.api.strategy import router as strategy_router
 from app.api.trading import router as trading_router
 from app.core.config import settings
+from app.core.logging_config import setup_logging
 from app.services.scheduler import start_scheduler, stop_scheduler
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    setup_logging("DEBUG" if settings.debug else "INFO")
     if settings.scheduler_auto_start:
         start_scheduler(settings.scheduler_interval_minutes)
     yield
